@@ -1,18 +1,18 @@
 class UsersController < ApplicationController
   def show
-    @user = User.find_by(id: params[:id])
+    @user = User.find_by!(id: params[:id])
     respond_to do |format|
-      if @user
-        format.json { render json: @user, status: :ok }
-        format.html { redirect_to @user }
-      else
-        format.json {
-          render json: {
-            error: "User with id #{params[:id} not found."
-          }, status: :not_found
-        }
-        format.html { redirect_to root_path, flash: { error: "User with id #{params[:id} not found." } }
+      format.json { render json: @user, status: :ok }
+      format.html
+    end
+  rescue ActiveRecord::RecordNotFound => e
+    respond_to do |format|
+      format.json do
+        render json: {
+          error: e.to_s
+        }, status: :not_found
       end
+      format.html { redirect_to root_path, flash: { error: e.to_s } }
     end
   end
 end
