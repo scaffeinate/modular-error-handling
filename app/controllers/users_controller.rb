@@ -1,14 +1,18 @@
 class UsersController < ApplicationController
   def create
-    @user = User.new(email: params[:email])
-    render json: @user if @user.save!
+    @user = User.create!
+    render json: @user if @user.persisted?
   end
 
   def show
     @user = User.find_by!(id: params[:id])
     respond_to do |format|
-      format.json { render json: @user, status: :ok }
-      format.html
+      if @user.is_visible?
+        format.json { render json: @user, status: :ok }
+        format.html
+      else
+        raise Error::NotVisibleError
+      end
     end
   end
 end
