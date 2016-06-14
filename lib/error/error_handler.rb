@@ -2,27 +2,26 @@ module Error
   module ErrorHandler
     def self.included(clazz)
       clazz.class_eval do
-        rescue_from StandardError, with: :handle_error
-        rescue_from CustomError, with: :custom_error
-        rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+        rescue_from StandardError do |e|
+          respond(:internal_server_error, 500, e.to_s)
+        end
+        rescue_from CustomError do |e|
+          respond(e.error, e.status, e.message)
+        end
+        rescue_from ActiveRecord::RecordNotFound do |e|
+          respond(:record_not_found, 404, e.to_s)
+        end
       end
     end
 
     private
 
-    def record_not_found(_e)
-      json = Helpers::Render.json(404, :record_not_found, _e.to_s)
-      render json: json, status: 404
-    end
-
-    def custom_error(_e)
-      json = _e.fetch_json
-      render json: json, status: _e.status
-    end
-
-    def handle_error(_e)
-      json = Helpers::Render.json(500, :internal_server_error, _e.to_s)
-      render json: json, status: 500
+    def respond(_error, _status, _message)
+      json = Helpers::Render.json(_error, _status, _message)
+      respond_to do |format|
+        format.json { render json: json }
+        format.html { redirect_to root_path, flash: { error: _message.to_s } }
+      end
     end
   end
 end
