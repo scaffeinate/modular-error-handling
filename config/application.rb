@@ -26,5 +26,6 @@ module ErrorHandlingDemo
       g.test_framework :rspec
     end
     config.autoload_paths += %W(#{config.root}/lib)
+    config.exceptions_app = routes
   end
 end

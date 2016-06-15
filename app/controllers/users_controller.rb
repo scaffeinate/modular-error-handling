@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   def create
-    @user = User.create!
-    @user.persisted? if render json: @user
+    @user = User.create
+    render json: @user if @user.persisted?
   end
 
   def show

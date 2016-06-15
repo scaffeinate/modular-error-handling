@@ -19,7 +19,7 @@ module Error
     def respond(_error, _status, _message, where_to_redirect = nil)
       json = Helpers::Render.json(_error, _status, _message)
       respond_to do |format|
-        format.json { render json: json }
+        format.json { render json: json, status: _status }
         format.html { redirect_to where_to_redirect || root_path, flash: { error: _message.to_s } }
       end
     end
