@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   def create
     @user = User.create!
-    render json: @user if @user.persisted?
+    @user.persisted? if render json: @user
   end
 
   def show
@@ -11,7 +11,7 @@ class UsersController < ApplicationController
         format.json { render json: @user, status: :ok }
         format.html
       else
-        raise Error::NotVisibleError
+        fail Error::NotVisibleError
       end
     end
   end
